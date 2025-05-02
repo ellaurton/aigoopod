@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Korean Fact</title>
+</head>
+<body>
+  <h1>Random Korean Fact Generator 🇰🇷</h1>
+  <button id="loadFact">Get Random Fact</button>
+  <div id="factDisplay" style="margin-top: 20px; font-size: 1.2em;"></div>
+
+  <script>
+    const koreanTopics = [
+      'Hangul', 'Sejong the Great', 'Joseon', 'Hanbok', 'Korea', 'BTS', 
+      'Jeju Island',  '38th parallel'
+    ];
+
+    async function getRandomKoreanFact() {
+      const factDisplay = document.getElementById('factDisplay');
+      factDisplay.innerHTML = 'Loading...';
+
+      const randomTopic = koreanTopics[Math.floor(Math.random() * koreanTopics.length)];
+
+      try {
+        const response = await fetch(`https://en.wikipedia.org/w/rest.php/v1/search/page?q=${encodeURIComponent(randomTopic)}&limit=1`);
+        const data = await response.json();
+
+        if (data.pages && data.pages.length > 0) {
+          const page = data.pages[0];
+          const title = page.title;
+          const description = page.description || 'No description available.';
+          const url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`;
+
+          factDisplay.innerHTML = `
+            <strong>${title}</strong><br>
+            ${description}<br>
+            <a href="${url}" target="_blank">Read more</a>
+          `;
+        } else {
+          factDisplay.innerHTML = 'No fact found. Try again!';
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        factDisplay.innerHTML = 'Failed to load fact. Please try again!';
+      }
+    }
+
+    document.getElementById('loadFact').addEventListener('click', getRandomKoreanFact);
+  </script>
+</body>
+</html>
